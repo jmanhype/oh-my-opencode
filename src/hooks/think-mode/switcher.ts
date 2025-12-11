@@ -9,6 +9,7 @@ const HIGH_VARIANT_MAP: Record<string, string> = {
   "gpt-5": "gpt-5-high",
   "gpt-5-low": "gpt-5-high",
   "gpt-5-medium": "gpt-5-high",
+  "gpt-5-mini": "gpt-5-mini-high",
   "gpt-5-codex": "gpt-5-codex-high",
   // GPT-5.1
   "gpt-5.1": "gpt-5.1-high",
@@ -16,14 +17,13 @@ const HIGH_VARIANT_MAP: Record<string, string> = {
   "gpt-5.1-medium": "gpt-5.1-high",
   "gpt-5.1-codex": "gpt-5.1-codex-high",
   "gpt-5.1-codex-max": "gpt-5.1-codex-max-high",
-  // GPT-5.2 (Instant, Thinking, Pro)
+  // GPT-5.2 (gpt-5.2 = Thinking, gpt-5.2-chat-latest = Instant, gpt-5.2-pro = Pro)
   "gpt-5.2": "gpt-5.2-high",
   "gpt-5.2-low": "gpt-5.2-high",
   "gpt-5.2-medium": "gpt-5.2-high",
-  "gpt-5.2-instant": "gpt-5.2-instant-high",
-  "gpt-5.2-thinking": "gpt-5.2-thinking-high",
+  "gpt-5.2-chat-latest": "gpt-5.2-chat-latest-high",
   "gpt-5.2-pro": "gpt-5.2-pro-high",
-  "gpt-5.2-codex": "gpt-5.2-codex-high",
+  "gpt-5.2-pro-medium": "gpt-5.2-pro-high",
 }
 
 const ALREADY_HIGH: Set<string> = new Set([
@@ -35,6 +35,7 @@ const ALREADY_HIGH: Set<string> = new Set([
   // GPT-5
   "gpt-5-high",
   "gpt-5-xhigh",
+  "gpt-5-mini-high",
   "gpt-5-codex-high",
   // GPT-5.1
   "gpt-5.1-high",
@@ -44,10 +45,9 @@ const ALREADY_HIGH: Set<string> = new Set([
   // GPT-5.2
   "gpt-5.2-high",
   "gpt-5.2-xhigh",
-  "gpt-5.2-instant-high",
-  "gpt-5.2-thinking-high",
+  "gpt-5.2-chat-latest-high",
   "gpt-5.2-pro-high",
-  "gpt-5.2-codex-high",
+  "gpt-5.2-pro-xhigh",
 ])
 
 export const THINKING_CONFIGS: Record<string, Record<string, unknown>> = {
