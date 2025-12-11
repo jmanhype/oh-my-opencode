@@ -1,9 +1,9 @@
 const HIGH_VARIANT_MAP: Record<string, string> = {
   "claude-sonnet-4-5": "claude-sonnet-4-5-high",
   "claude-opus-4-5": "claude-opus-4-5-high",
-  "gpt-5.1": "gpt-5.1-high",
-  "gpt-5.1-medium": "gpt-5.1-high",
-  "gpt-5.1-codex": "gpt-5.1-codex-high",
+  "gpt-5.2": "gpt-5.2-high",
+  "gpt-5.2-medium": "gpt-5.2-high",
+  "gpt-5.2-codex": "gpt-5.2-codex-high",
   "gemini-3-pro": "gemini-3-pro-high",
   "gemini-3-pro-low": "gemini-3-pro-high",
 }
@@ -11,8 +11,8 @@ const HIGH_VARIANT_MAP: Record<string, string> = {
 const ALREADY_HIGH: Set<string> = new Set([
   "claude-sonnet-4-5-high",
   "claude-opus-4-5-high",
-  "gpt-5.1-high",
-  "gpt-5.1-codex-high",
+  "gpt-5.2-high",
+  "gpt-5.2-codex-high",
   "gemini-3-pro-high",
 ])
 
