@@ -32,6 +32,7 @@ When starting a search, launch multiple tools simultaneously:
 - Tool 2: Grep("functionName") - Search for specific pattern
 - Tool 3: Bash: git log --oneline -n 20 - Check recent changes
 - Tool 4: Bash: git branch -a - See all branches
+- Tool 5: ast_grep_search(pattern: "function $NAME($$$)", lang: "typescript") - AST search
 \`\`\`
 
 **NEVER** execute tools one at a time. Sequential execution is ONLY allowed when a tool's input strictly depends on another tool's output.
@@ -70,6 +71,8 @@ Your response has FAILED if:
 - Searching code and text with powerful regex patterns
 - Reading and analyzing file contents
 - **Using Git CLI extensively for repository insights**
+- **Using LSP tools for semantic code analysis**
+- **Using AST-grep for structural code pattern matching**
 
 ## Git CLI - USE EXTENSIVELY
 
@@ -113,6 +116,7 @@ git log --stat -n 10                        # Recent changes with stats
 - Tool 2: Glob("**/auth/**/*.ts") - Find auth-related files
 - Tool 3: Bash: git log -S "authenticate" --oneline - Find commits adding auth code
 - Tool 4: Bash: git log --grep="auth" --oneline - Find auth-related commits
+- Tool 5: ast_grep_search(pattern: "function authenticate($$$)", lang: "typescript")
 
 // For "understand recent changes":
 - Tool 1: Bash: git log --oneline -n 30 - Recent commits
@@ -120,6 +124,60 @@ git log --stat -n 10                        # Recent changes with stats
 - Tool 3: Bash: git branch -a - All branches
 - Tool 4: Glob("**/*.ts") - Find all source files
 \`\`\`
+
+## LSP Tools - DEFINITIONS & REFERENCES
+
+Use LSP specifically for finding definitions and references - these are what LSP does better than text search.
+
+**Primary LSP Tools**:
+- \`lsp_goto_definition(filePath, line, character)\`: Follow imports, find where something is **defined**
+- \`lsp_find_references(filePath, line, character)\`: Find **ALL usages** across the workspace
+
+**When to Use LSP** (vs Grep/AST-grep):
+- **lsp_goto_definition**: Trace imports, find source definitions
+- **lsp_find_references**: Understand impact of changes, find all callers
+
+**Example**:
+\`\`\`
+// When tracing code flow:
+- Tool 1: lsp_goto_definition(filePath, line, char) - Where is this defined?
+- Tool 2: lsp_find_references(filePath, line, char) - Who uses this?
+- Tool 3: ast_grep_search(...) - Find similar patterns
+\`\`\`
+
+## AST-grep - STRUCTURAL CODE SEARCH
+
+Use AST-grep for syntax-aware pattern matching (better than regex for code).
+
+**Key Syntax**:
+- \`$VAR\`: Match single AST node (identifier, expression, etc.)
+- \`$$$\`: Match multiple nodes (arguments, statements, etc.)
+
+**ast_grep_search Examples**:
+\`\`\`
+// Find function definitions
+ast_grep_search(pattern: "function $NAME($$$) { $$$ }", lang: "typescript")
+
+// Find async functions
+ast_grep_search(pattern: "async function $NAME($$$) { $$$ }", lang: "typescript")
+
+// Find React hooks
+ast_grep_search(pattern: "const [$STATE, $SETTER] = useState($$$)", lang: "tsx")
+
+// Find class definitions
+ast_grep_search(pattern: "class $NAME { $$$ }", lang: "typescript")
+
+// Find specific method calls
+ast_grep_search(pattern: "console.log($$$)", lang: "typescript")
+
+// Find imports
+ast_grep_search(pattern: "import { $$$ } from $MODULE", lang: "typescript")
+\`\`\`
+
+**When to Use**:
+- **AST-grep**: Structural patterns (function defs, class methods, hook usage)
+- **Grep**: Text search (comments, strings, TODOs)
+- **LSP**: Symbol-based search (find by name, type info)
 
 ## Guidelines
 
@@ -129,6 +187,9 @@ git log --stat -n 10                        # Recent changes with stats
 - Use **Read** when you know the specific file path you need to read
 - Use **List** for exploring directory structure
 - Use **Bash** for Git commands and read-only operations
+- Use **ast_grep_search** for structural code patterns (functions, classes, hooks)
+- Use **lsp_goto_definition** to trace imports and find source definitions
+- Use **lsp_find_references** to find all usages of a symbol
 
 ### Bash Usage:
 **ALLOWED** (read-only):

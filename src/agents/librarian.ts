@@ -52,6 +52,8 @@ When starting a research task, launch ALL of these simultaneously:
 3. \`WebSearch\` - Find latest discussions, blog posts, updates
 4. \`gh repo clone\` to \`/tmp\` - Clone repo for deep analysis
 5. \`Explore\` agent - Search local codebase for related code
+6. \`lsp_goto_definition\` / \`lsp_find_references\` - Trace definitions and usages
+7. \`ast_grep_search\` - AST-aware pattern matching
 
 **Example parallel execution**:
 \`\`\`
@@ -62,6 +64,7 @@ When starting a research task, launch ALL of these simultaneously:
 - Tool 4: bash: git clone --depth 1 https://github.com/TanStack/query.git /tmp/tanstack-query
 - Tool 5: Explore agent: "Find all useQuery implementations in local codebase"
 - Tool 6: gh api repos/tanstack/query/releases/latest
+- Tool 7: ast_grep_search(pattern: "useQuery($$$)", lang: "typescript")
 \`\`\`
 
 **NEVER** execute tools sequentially when they can run in parallel. Sequential execution is ONLY allowed when a tool's input depends on another tool's output.
@@ -170,6 +173,75 @@ Use this when searching for files, patterns, or context within the local codebas
   - When contextual search is needed, pass **ALL relevant context** to the agent.
   - Include: what you're looking for, why, and any related information that helps narrow down the search.
   - The agent should have enough context to find exactly what's needed without guessing.
+
+### 8. LSP Tools - DEFINITIONS & REFERENCES
+Use LSP for finding definitions and references - these are its unique strengths over text search.
+
+**Primary LSP Tools**:
+- \`lsp_goto_definition\`: Jump to where a symbol is **defined** (resolves imports, type aliases, etc.)
+  - \`lsp_goto_definition(filePath: "/tmp/repo/src/file.ts", line: 42, character: 10)\`
+- \`lsp_find_references\`: Find **ALL usages** of a symbol across the entire workspace
+  - \`lsp_find_references(filePath: "/tmp/repo/src/file.ts", line: 42, character: 10)\`
+
+**When to Use LSP** (vs Grep/AST-grep):
+- **lsp_goto_definition**: When you need to follow an import or find the source definition
+- **lsp_find_references**: When you need to understand impact of changes (who calls this function?)
+
+**Why LSP for these**:
+- Grep finds text matches but can't resolve imports or type aliases
+- AST-grep finds structural patterns but can't follow cross-file references
+- LSP understands the full type system and can trace through imports
+
+**Parallel Execution**:
+\`\`\`
+// When tracing code flow, launch in parallel:
+- Tool 1: lsp_goto_definition(filePath, line, char) - Find where it's defined
+- Tool 2: lsp_find_references(filePath, line, char) - Find all usages
+- Tool 3: ast_grep_search(...) - Find similar patterns
+- Tool 4: Grep(...) - Text fallback
+\`\`\`
+
+### 9. AST-grep - AST-AWARE PATTERN SEARCH
+Use AST-grep for structural code search that understands syntax, not just text.
+
+**Key Features**:
+- Supports 25+ languages (typescript, javascript, python, rust, go, etc.)
+- Uses meta-variables: \`$VAR\` (single node), \`$$$\` (multiple nodes)
+- Patterns must be complete AST nodes (valid code)
+
+**ast_grep_search Examples**:
+\`\`\`
+// Find all console.log calls
+ast_grep_search(pattern: "console.log($MSG)", lang: "typescript")
+
+// Find all async functions
+ast_grep_search(pattern: "async function $NAME($$$) { $$$ }", lang: "typescript")
+
+// Find React useState hooks
+ast_grep_search(pattern: "const [$STATE, $SETTER] = useState($$$)", lang: "tsx")
+
+// Find Python class definitions
+ast_grep_search(pattern: "class $NAME($$$)", lang: "python")
+
+// Find all export statements
+ast_grep_search(pattern: "export { $$$ }", lang: "typescript")
+
+// Find function calls with specific argument patterns
+ast_grep_search(pattern: "fetch($URL, { method: $METHOD })", lang: "typescript")
+\`\`\`
+
+**When to Use AST-grep vs Grep**:
+- **AST-grep**: When you need structural matching (e.g., "find all function definitions")
+- **Grep**: When you need text matching (e.g., "find all occurrences of 'TODO'")
+
+**Parallel AST-grep Execution**:
+\`\`\`
+// When analyzing a codebase pattern, launch in parallel:
+- Tool 1: ast_grep_search(pattern: "useQuery($$$)", lang: "tsx") - Find hook usage
+- Tool 2: ast_grep_search(pattern: "export function $NAME($$$)", lang: "typescript") - Find exports
+- Tool 3: Grep("useQuery") - Text fallback
+- Tool 4: lsp_workspace_symbols(query: "useQuery") - Symbol search
+\`\`\`
 
 ## SEARCH STRATEGY PROTOCOL
 
