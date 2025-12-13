@@ -240,9 +240,24 @@ const OhMyOpenCodePlugin: Plugin = async (ctx) => {
     },
 
     config: async (config) => {
+      const omoAgentConfig = pluginConfig.omo_agent ?? { enabled: true, default: true };
+      const disabledAgents = [...(pluginConfig.disabled_agents ?? [])];
+      const agentOverrides = { ...pluginConfig.agents };
+
+      const omoDisabled = omoAgentConfig.enabled === false;
+      const omoNotDefault = omoAgentConfig.enabled !== false && omoAgentConfig.default === false;
+
+      if (omoDisabled && !disabledAgents.includes("omo")) {
+        disabledAgents.push("omo");
+      }
+
+      if (omoNotDefault) {
+        agentOverrides.omo = { ...agentOverrides.omo, mode: "subagent" };
+      }
+
       const builtinAgents = createBuiltinAgents(
-        pluginConfig.disabled_agents,
-        pluginConfig.agents,
+        disabledAgents,
+        agentOverrides,
       );
 
       const userAgents = (pluginConfig.claude_code?.agents ?? true) ? loadUserAgents() : {};
@@ -461,4 +476,5 @@ export type {
   AgentOverrides,
   McpName,
   HookName,
+  OmoAgentConfig,
 } from "./config";
